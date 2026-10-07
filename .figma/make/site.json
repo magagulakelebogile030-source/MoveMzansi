@@ -1,0 +1,10 @@
+{
+  "description": "Empowering South African runners, this app enhances safety with live tracking, connects communities, and simplifies race discovery for a seamless running experience.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}
