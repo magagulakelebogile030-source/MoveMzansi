@@ -1,0 +1,58 @@
+name: Build Move Mzansi Android APK
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-android:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Enable pnpm
+        run: corepack enable
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build web app
+        run: pnpm run build
+
+      - name: Install Capacitor
+        run: pnpm add @capacitor/core @capacitor/cli @capacitor/android
+
+      - name: Configure Capacitor
+        run: pnpm exec cap init "Move Mzansi" "com.movemzansi.app" --web-dir dist
+
+      - name: Add Android platform
+        run: pnpm exec cap add android
+
+      - name: Copy web app into Android project
+        run: pnpm exec cap sync android
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Set up Android
+        uses: android-actions/setup-android@v3
+
+      - name: Build APK
+        working-directory: android
+        run: ./gradlew assembleDebug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: move-mzansi-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
